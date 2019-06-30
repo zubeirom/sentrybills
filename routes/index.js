@@ -23,7 +23,6 @@ const UserSerializer = new JSONAPISerializer('User', {
 
 
 const User = require('../models/User');
-const Person = require('../models/Bill');
 
 router.post('/token', asyncHandler(async (req, res, next) => {
     if (req.body.grant_type === 'password') {
@@ -31,23 +30,18 @@ router.post('/token', asyncHandler(async (req, res, next) => {
             const { username, password } = req.body;
             await User.find({ email: username }, async (err, docs) => {
                 if (docs.length !== 0) {
-                    const findPerson = await Person.find({ email: username });
-
-                    if (findPerson.length !== 0) {
-                        currentUser = username;
-                        bcrypt.compare(password, docs[0].password, (error, val) => {
-                            if (error) {
-                                next(error);
-                            }
-                            if (val) {
-                                res.status(200).send('{ "access_token": "secret token"}');
-                                next();
-                            } else {
-                                res.status(400).send('{"error": "invalid_grant"}');
-                                next();
-                            }
-                        });
-                    }
+                    bcrypt.compare(password, docs[0].password, (error, val) => {
+                        if (error) {
+                            next(error);
+                        }
+                        if (val) {
+                            res.status(200).send('{ "access_token": "secret token"}');
+                            next();
+                        } else {
+                            res.status(400).send('{"error": "invalid_grant"}');
+                            next();
+                        }
+                    });
                 } else {
                     res.status(400).send('{"error": "invalid_grant"}');
                     next();
