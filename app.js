@@ -15,8 +15,8 @@ app.use(cors());
 
 // DB
 mongoose.connect('mongodb://127.0.0.1:27017/sentrybills', { useNewUrlParser: true })
-  .then(() => console.log('MongoDB connected...'))
-  .catch(err => console.log(err));
+    .then(() => console.log('MongoDB connected...'))
+    .catch(err => console.log(err));
 
 // Routes
 app.use('/', require('./routes/index'));

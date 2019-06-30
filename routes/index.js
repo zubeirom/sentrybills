@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const express = require('express');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt-nodejs');
@@ -25,14 +26,16 @@ const UserSerializer = new JSONAPISerializer('User', {
 
 const User = require('../models/User');
 
+let currentUser;
+
 router.post('/token', asyncHandler(async (req, res, next) => {
     if (req.body.grant_type === 'password') {
         try {
             const { username, password } = req.body;
             await User.find({ email: username }, async (err, docs) => {
-                console.log(docs);
                 if (docs.length !== 0) {
                     if (docs[0].password === password) {
+                        currentUser = docs[0]._id;
                         res.status(200).send('{ "access_token": "secret token"}');
                         next();
                     } else {
@@ -106,6 +109,15 @@ router.post('/users', asyncHandler(async (req, res, next) => {
         }
     });
 }));
+
+router.get('/bills', asyncHandler(async (req, res, next) => {
+    try {
+        
+    } catch (error) {
+        next(error);
+    }
+
+}))
 
 
 module.exports = router;

@@ -9,10 +9,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    bills: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Bill',
-    }],
 });
 
 const User = mongoose.model('User', UserSchema);

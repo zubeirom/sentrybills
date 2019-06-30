@@ -17,6 +17,10 @@ const BillSchema = new mongoose.Schema({
         type: String,
         default: 'No Description',
     },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
 });
 
 const Bill = mongoose.model('Bill', BillSchema);
