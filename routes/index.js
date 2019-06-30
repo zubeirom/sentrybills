@@ -18,6 +18,7 @@ const UserSerializer = new JSONAPISerializer('User', {
     attributes: [
         'email',
         'password',
+        'bills',
     ],
 });
 
@@ -29,19 +30,25 @@ router.post('/token', asyncHandler(async (req, res, next) => {
         try {
             const { username, password } = req.body;
             await User.find({ email: username }, async (err, docs) => {
+                console.log(docs);
                 if (docs.length !== 0) {
-                    bcrypt.compare(password, docs[0].password, (error, val) => {
-                        if (error) {
-                            next(error);
-                        }
-                        if (val) {
-                            res.status(200).send('{ "access_token": "secret token"}');
-                            next();
-                        } else {
-                            res.status(400).send('{"error": "invalid_grant"}');
-                            next();
-                        }
-                    });
+                    if (docs[0].password === password) {
+                        res.status(200).send('{ "access_token": "secret token"}');
+                        next();
+                    } else {
+                        bcrypt.compare(password, docs[0].password, (error, val) => {
+                            if (error) {
+                                next(error);
+                            }
+                            if (val) {
+                                res.status(200).send('{ "access_token": "secret token"}');
+                                next();
+                            } else {
+                                res.status(400).send('{"error": "invalid_grant"}');
+                                next();
+                            }
+                        });
+                    }
                 } else {
                     res.status(400).send('{"error": "invalid_grant"}');
                     next();
@@ -63,8 +70,10 @@ router.post('/users', asyncHandler(async (req, res, next) => {
 
             const findUser = await User.find({ email });
 
+            console.log(findUser);
+
             if (findUser.length > 0) {
-                res.send(ResFoundErr);
+                res.status(409).send(ResFoundErr);
                 next();
             } else {
                 bcrypt.genSalt(10, (e, salt) => {
@@ -97,5 +106,6 @@ router.post('/users', asyncHandler(async (req, res, next) => {
         }
     });
 }));
+
 
 module.exports = router;
