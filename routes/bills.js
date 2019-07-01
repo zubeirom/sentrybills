@@ -2,7 +2,6 @@ const express = require('express');
 const asyncHandler = require('express-async-handler');
 const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const JSONAPISerializer = require('jsonapi-serializer').Serializer;
-const JSONAPIError = require('jsonapi-serializer').Error;
 const mongoose = require('mongoose');
 
 
@@ -30,6 +29,31 @@ router.get('/', asyncHandler(async (req, res, next) => {
         const billsJson = BillSerializer.serialize(findBills);
         res.status(200).send(billsJson);
         next();
+    } catch (error) {
+        next(error);
+    }
+}));
+
+router.post('/new', asyncHandler((req, res, next) => {
+    try {
+        new JSONAPIDeserializer({
+            keyForAttribute: 'camelCase',
+        }).deserialize(req.body, async (err, bill) => {
+            console.log(bill);
+            const {
+                name, total, due, note, addToCal, balanced, userId,
+            } = bill;
+
+            const newBill = new Bill({
+                name, total, due, note, addToCal, balanced, userId,
+            });
+
+            const saveBill = await newBill.save();
+
+            const billJson = BillSerializer.serialize(saveBill);
+            res.status(200).send(billJson);
+            next();
+        });
     } catch (error) {
         next(error);
     }
