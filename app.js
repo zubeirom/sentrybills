@@ -20,6 +20,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/sentrybills', { useNewUrlParser: tru
 
 // Routes
 app.use('/', require('./routes/index'));
+app.use('/bills', require('./routes/bills'));
 
 const PORT = process.env.PORT || 3000;
 

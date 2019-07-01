@@ -8,6 +8,7 @@ const BillSchema = new mongoose.Schema({
     total: {
         type: Number,
         required: true,
+        default: 0,
     },
     due: {
         type: Date,
@@ -16,6 +17,16 @@ const BillSchema = new mongoose.Schema({
     note: {
         type: String,
         default: 'No Description',
+    },
+    balanced: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+    addToCal: {
+        type: Boolean,
+        required: true,
+        default: false,
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
