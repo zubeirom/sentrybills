@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 const express = require('express');
 const asyncHandler = require('express-async-handler');
-const bcrypt = require('bcrypt-nodejs');
+const bcrypt = require('bcryptjs');
 const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const JSONAPISerializer = require('jsonapi-serializer').Serializer;
 const JSONAPIError = require('jsonapi-serializer').Error;
@@ -18,7 +18,6 @@ const UserSerializer = new JSONAPISerializer('User', {
     attributes: [
         'email',
         'password',
-        'bills',
     ],
 });
 
@@ -29,24 +28,21 @@ router.post('/token', asyncHandler(async (req, res, next) => {
     if (req.body.grant_type === 'password') {
         try {
             const { username, password } = req.body;
-            await User.find({ email: username }, async (err, docs) => {
+            await User.find({ email: username }, async (e, docs) => {
                 if (docs.length !== 0) {
                     if (docs[0].password === password) {
                         res.status(200).send(`{ "access_token": "${docs[0]._id}"}`);
                         next();
                     } else {
-                        bcrypt.compare(password, docs[0].password, (error, val) => {
-                            if (error) {
-                                next(error);
-                            }
-                            if (val) {
-                                res.status(200).send(`{ "access_token": "${docs[0]._id}" }`);
-                                next();
-                            } else {
-                                res.status(400).send('{"error": "invalid_grant"}');
-                                next();
-                            }
-                        });
+                        const hash = docs[0].password;
+                        const val = bcrypt.compareSync(password, hash);
+                        if (val) {
+                            res.status(200).send(`{ "access_token": "${docs[0]._id}" }`);
+                            next();
+                        } else {
+                            res.status(400).send('{"error": "invalid_grant"}');
+                            next();
+                        }
                     }
                 } else {
                     res.status(400).send('{"error": "invalid_grant"}');
@@ -62,48 +58,38 @@ router.post('/token', asyncHandler(async (req, res, next) => {
 }));
 
 router.post('/users', asyncHandler(async (req, res, next) => {
-    new JSONAPIDeserializer().deserialize(req.body, async (err, user) => {
-        try {
+    try {
+        new JSONAPIDeserializer().deserialize(req.body, async (err, user) => {
             const { email } = user;
             let { password } = user;
 
             const findUser = await User.find({ email });
 
-            console.log(findUser);
-
             if (findUser.length > 0) {
                 res.status(409).send(ResFoundErr);
                 next();
             } else {
-                bcrypt.genSalt(10, (e, salt) => {
-                    if (e) {
-                        console.log(e);
-                    }
-                    bcrypt.hash(password, salt, null, async (error, hash) => {
-                        if (error) {
-                            next(error);
-                        }
-                        password = hash;
+                const salt = bcrypt.genSaltSync(10);
+                const hash = bcrypt.hashSync(password, salt);
+                password = hash;
 
-                        const newUser = new User({
-                            email,
-                            password,
-                        });
-
-                        const saveUser = await newUser.save();
-
-                        if (saveUser) {
-                            const UserJson = UserSerializer.serialize(saveUser);
-                            res.status(200).json(UserJson);
-                            next();
-                        }
-                    });
+                const newUser = new User({
+                    email,
+                    password,
                 });
+
+                const saveUser = await newUser.save();
+
+                if (saveUser) {
+                    const UserJson = UserSerializer.serialize(saveUser);
+                    res.status(200).json(UserJson);
+                    next();
+                }
             }
-        } catch (error) {
-            next(error);
-        }
-    });
+        });
+    } catch (error) {
+        next(error);
+    }
 }));
 
 module.exports = router;
