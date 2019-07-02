@@ -34,12 +34,24 @@ router.get('/', asyncHandler(async (req, res, next) => {
     }
 }));
 
+router.patch('/:id', asyncHandler(async (req, res, next) => {
+    try {
+        const bill = await Bill.findById(req.params.id);
+        bill.balanced = true;
+        await bill.save();
+        const billsJson = BillSerializer.serialize(bill);
+        res.status(200).send(billsJson);
+        next();
+    } catch (error) {
+        next(error);
+    }
+}));
+
 router.post('/new', asyncHandler((req, res, next) => {
     try {
         new JSONAPIDeserializer({
             keyForAttribute: 'camelCase',
         }).deserialize(req.body, async (err, bill) => {
-            console.log(bill);
             const {
                 name, total, due, note, addToCal, balanced, userId,
             } = bill;
