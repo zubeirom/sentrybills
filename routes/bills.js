@@ -47,6 +47,16 @@ router.patch('/:id', asyncHandler(async (req, res, next) => {
     }
 }));
 
+router.delete('/:id', asyncHandler(async (req, res, next) => {
+    try {
+        await Bill.deleteOne({ _id: req.params.id });
+        res.status(204).send({});
+        next();
+    } catch (error) {
+        next(error);
+    }
+}));
+
 router.post('/new', asyncHandler((req, res, next) => {
     try {
         new JSONAPIDeserializer({
