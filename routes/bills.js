@@ -23,12 +23,20 @@ const Bill = require('../models/Bill');
 
 router.get('/', asyncHandler(async (req, res, next) => {
     try {
-        const { userId } = req.query;
-        const id = mongoose.Types.ObjectId(userId);
-        const findBills = await Bill.find({ userId: id });
-        const billsJson = BillSerializer.serialize(findBills);
-        res.status(200).send(billsJson);
-        next();
+        if (req.query.name) {
+            const { name, userId } = req.query;
+            const findBills = await Bill.find({ name, userId });
+            const billsJson = BillSerializer.serialize(findBills);
+            res.status(200).send(billsJson);
+            next();
+        } else {
+            const { userId } = req.query;
+            const id = mongoose.Types.ObjectId(userId);
+            const findBills = await Bill.find({ userId: id });
+            const billsJson = BillSerializer.serialize(findBills);
+            res.status(200).send(billsJson);
+            next();
+        }
     } catch (error) {
         next(error);
     }
