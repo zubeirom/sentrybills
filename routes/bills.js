@@ -25,8 +25,17 @@ router.get('/', asyncHandler(async (req, res, next) => {
     try {
         if (req.query.name) {
             const { name, userId } = req.query;
-            const findBills = await Bill.find({ name, userId });
-            const billsJson = BillSerializer.serialize(findBills);
+            const findBills = await Bill.find({ userId });
+            const filteredBills = [];
+            findBills.forEach((bill) => {
+                const n = bill.name;
+                const nl = n.toLowerCase();
+                if (nl.includes(name)) {
+                    filteredBills.push(bill);
+                }
+            });
+
+            const billsJson = BillSerializer.serialize(filteredBills);
             res.status(200).send(billsJson);
             next();
         } else {
