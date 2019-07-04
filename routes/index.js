@@ -105,6 +105,7 @@ router.get('/users', asyncHandler(async (req, res, next) => {
     }
 }));
 
+// DELETE /USER
 router.delete('/users/:id', asyncHandler(async (req, res, next) => {
     try {
         const id = mongoose.Types.ObjectId(req.params.id);
