@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const JSONAPISerializer = require('jsonapi-serializer').Serializer;
 const JSONAPIError = require('jsonapi-serializer').Error;
+const mongoose = require('mongoose');
 
 const router = express.Router();
 
@@ -87,6 +88,29 @@ router.post('/users', asyncHandler(async (req, res, next) => {
                 }
             }
         });
+    } catch (error) {
+        next(error);
+    }
+}));
+
+router.get('/users', asyncHandler(async (req, res, next) => {
+    try {
+        const id = mongoose.Types.ObjectId(req.query.id);
+        const bill = await User.findById(id);
+        const billsJson = UserSerializer.serialize(bill);
+        res.status(200).send(billsJson);
+        next();
+    } catch (error) {
+        next(error);
+    }
+}));
+
+router.delete('/users/:id', asyncHandler(async (req, res, next) => {
+    try {
+        const id = mongoose.Types.ObjectId(req.params.id);
+        await User.deleteOne({ _id: id });
+        res.status(204).send({});
+        next();
     } catch (error) {
         next(error);
     }
