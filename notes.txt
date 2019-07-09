@@ -1,0 +1,5 @@
+Authenticate with google,
+once authorized
+
+try to create gcal event
+search for insert method in google calendar api docs
