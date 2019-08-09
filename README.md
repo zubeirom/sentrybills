@@ -1,7 +1,7 @@
 # Easynet
 > A very simple social network. The server runs on https://api-easynet.herokuapp.com
 
-Here is the frontend Repo: https://github.com/zubeir68/sentrybills-client
+Here is the frontend Repo: https://github.com/zubeir68/sentrybills-frontend
 
 ## Tech Stack
 
