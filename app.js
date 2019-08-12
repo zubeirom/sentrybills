@@ -2,7 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const http = require('http');
 
+
+/** This will prevent heroku from putting app on sleepmode */
+setInterval(() => {
+    http.get('https://sentrybills.herokuapp.com');
+}, 300000);
 
 const app = express();
 
