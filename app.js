@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const http = require('http');
 
 
-/** This will prevent heroku from putting app on sleepmode */
+/** This will prevent heroku from putting app on sleepmode  */
 setInterval(() => {
     http.get('https://sentrybills.herokuapp.com/bills');
 }, 300000);
