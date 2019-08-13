@@ -8,7 +8,6 @@ const http = require('http');
 /** This will prevent heroku from putting app on sleepmode */
 setInterval(() => {
     http.get('https://sentrybills.herokuapp.com/bills');
-    http.get('https://sentrybillsapi.herokuapp.com');
 }, 300000);
 
 const app = express();
