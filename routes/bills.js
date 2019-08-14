@@ -30,7 +30,7 @@ router.get('/', asyncHandler(async (req, res, next) => {
             findBills.forEach((bill) => {
                 const n = bill.name;
                 const nl = n.toLowerCase();
-                if (nl.includes(name)) {
+                if (nl.includes(name) || n.includes(name)) {
                     filteredBills.push(bill);
                 }
             });
